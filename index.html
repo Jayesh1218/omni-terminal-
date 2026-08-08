@@ -1,413 +1,591 @@
-Here is the complete, single-file HTML document that integrates the AI Automation Engine into your cyber terminal, featuring a dedicated AI panel, service management, and autonomous task execution.
+Here is a clean, well-structured HTML document with a modern dark theme, ample spacing, and a professional UI for the OMNI-AI terminal.
 ```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>OMNI-AI TERMINAL v5.0</title>
+    <title>OMNI-AI · v5.0</title>
     <style>
+        /* ---------- GLOBAL ---------- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         :root {
-            --neon-green: #00ff41;
-            --dark-green: #003b00;
-            --bg-black: #0d0d0d;
-            --font-stack: 'Courier New', Courier, monospace;
+            --neon: #00ffc8;
+            --neon-dim: #00aa88;
+            --bg-primary: #0b0f0e;
+            --bg-surface: #121916;
+            --bg-elevated: #1a241f;
+            --border-light: #2a3f36;
+            --text-primary: #d4eee6;
+            --text-muted: #7a9c8f;
+            --font-mono: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+            --radius: 12px;
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            background-color: var(--bg-black);
-            color: var(--neon-green);
-            font-family: var(--font-stack);
-            height: 100vh; width: 100vw;
+        html, body {
+            height: 100%;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 14px;
+            line-height: 1.5;
             overflow: hidden;
-            display: flex; flex-direction: column;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none; user-select: none;
-            touch-action: manipulation;
+            -webkit-font-smoothing: antialiased;
         }
 
-        #matrixCanvas {
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 1; opacity: 0.1;
-            pointer-events: none;
+        /* ---------- LAYOUT ---------- */
+        .app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 20px 20px 20px;
+            gap: 14px;
         }
 
-        .overlay {
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.15) 50%);
-            background-size: 100% 4px;
-            z-index: 10; pointer-events: none;
-        }
-
-        #header {
-            position: relative; z-index: 5;
-            background: rgba(0,20,0,0.95);
-            border-bottom: 1px solid var(--neon-green);
-            padding: 6px 12px;
-            display: flex; justify-content: space-between;
-            font-size: 11px; font-weight: bold;
-            text-shadow: 0 0 4px var(--neon-green);
-            flex-shrink: 0; align-items: center;
-            min-height: 38px;
-        }
-
-        #main-container {
-            position: relative; z-index: 5;
-            flex: 1; display: flex; flex-direction: column;
-            gap: 6px; padding: 8px;
-            overflow: hidden; min-height: 0;
-        }
-
-        /* Terminal + AI panel grid */
-        #terminal-area {
-            display: flex; flex-direction: column;
-            flex: 1 1 auto; min-height: 0;
-            background: rgba(5,10,5,0.9);
-            border: 1px solid var(--neon-green);
-            border-radius: 4px;
-            box-shadow: 0 0 8px rgba(0,255,65,0.15);
-        }
-
-        #terminal-logs {
-            flex: 1; overflow-y: auto;
-            font-size: 12px; line-height: 1.4;
-            padding: 8px 8px 4px;
-            -webkit-overflow-scrolling: touch;
-            overscroll-behavior: contain;
-        }
-
-        .cmd-line {
-            display: flex; align-items: center;
-            border-top: 1px solid #0a2a0a;
-            padding: 6px 8px;
-        }
-        .prompt {
-            color: #fff; text-shadow: 0 0 3px #fff;
-            margin-right: 6px; font-weight: bold; font-size: 12px;
-            flex-shrink: 0;
-        }
-        .cmd-input {
-            flex: 1; background: transparent; border: none;
-            color: var(--neon-green); font-family: var(--font-stack);
-            font-size: 12px; outline: none;
-            text-shadow: 0 0 3px var(--neon-green);
-            min-width: 0; caret-color: var(--neon-green);
-            -webkit-user-select: text; user-select: text;
-            min-height: 32px;
-        }
-
-        /* AI Agent Panel */
-        #ai-panel {
-            flex-shrink: 0;
-            background: rgba(0,10,0,0.95);
-            border: 1px solid #005500;
-            border-left: 3px solid #00ffaa;
-            border-radius: 4px;
-            padding: 6px 10px;
-            display: flex; flex-direction: column;
-            gap: 4px;
-            box-shadow: 0 0 6px rgba(0,255,170,0.2);
-        }
-
-        #ai-status-row {
-            display: flex; justify-content: space-between;
+        /* ---------- HEADER ---------- */
+        .header {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            font-size: 10px;
-            text-transform: uppercase;
+            padding: 10px 18px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            flex-shrink: 0;
+        }
+
+        .header__left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header__badge {
+            background: #00ffc822;
+            color: var(--neon);
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            border: 1px solid #00ffc844;
+        }
+
+        .header__status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--neon);
+            box-shadow: 0 0 8px var(--neon);
+        }
+
+        .header__clock {
+            font-size: 13px;
+            color: var(--text-muted);
             letter-spacing: 1px;
         }
-        #ai-status-indicator {
-            color: #00ffaa;
-            text-shadow: 0 0 6px #00ffaa;
-        }
-        #ai-thought-stream {
-            font-size: 10px;
-            color: #88ff88;
-            max-height: 40px;
-            overflow-y: auto;
-            background: #001a00;
-            padding: 4px 6px;
-            border-radius: 2px;
-            border: 1px solid #003300;
-            -webkit-overflow-scrolling: touch;
+
+        /* ---------- MAIN GRID ---------- */
+        .main-grid {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            gap: 14px;
+            min-height: 0;
         }
 
-        /* Quick action buttons */
-        #quick-actions {
-            display: flex; gap: 6px;
+        /* ---------- TERMINAL ---------- */
+        .terminal {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .terminal__output {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 22px 12px 22px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text-primary);
+            scroll-behavior: smooth;
+        }
+
+        .terminal__output > div {
+            padding: 2px 0;
+        }
+
+        .terminal__input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 22px;
+            border-top: 1px solid var(--border-light);
+            background: var(--bg-elevated);
+        }
+
+        .terminal__prompt {
+            color: var(--neon);
+            font-weight: 500;
+            font-size: 13px;
             flex-shrink: 0;
+        }
+
+        .terminal__input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            outline: none;
+            caret-color: var(--neon);
+        }
+
+        .terminal__input::placeholder {
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+
+        /* ---------- AI PANEL ---------- */
+        .ai-panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .ai-panel__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ai-panel__title {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .ai-panel__status {
+            font-size: 12px;
+            color: var(--neon);
+            background: #00ffc812;
+            padding: 2px 14px;
+            border-radius: 20px;
+            border: 1px solid #00ffc844;
+        }
+
+        .ai-panel__thought {
+            background: var(--bg-elevated);
+            border-radius: 8px;
+            padding: 12px 16px;
+            max-height: 64px;
+            overflow-y: auto;
+            font-size: 12px;
+            color: #b8d9cf;
+            line-height: 1.5;
+            border: 1px solid #2a3f36;
+        }
+
+        .ai-panel__actions {
+            display: flex;
+            gap: 10px;
             flex-wrap: wrap;
         }
-        .q-btn {
-            background: #002200;
-            border: 1px solid var(--neon-green);
-            color: var(--neon-green);
-            font-family: var(--font-stack);
-            font-size: 10px;
-            padding: 6px 12px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            touch-action: manipulation;
+
+        .btn {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            padding: 8px 18px;
+            border-radius: 30px;
             cursor: pointer;
-            flex: 1 0 auto;
-            min-width: 80px;
-            text-align: center;
-        }
-        .q-btn:active {
-            background: #004400;
-            box-shadow: 0 0 8px var(--neon-green);
+            transition: all 0.2s ease;
+            letter-spacing: 0.3px;
+            touch-action: manipulation;
         }
 
-        /* Sidebar widgets (horizontal scroll) */
-        #sidebar {
-            display: flex; flex-direction: row;
-            gap: 6px; flex-shrink: 0;
-            overflow-x: auto; padding-bottom: 4px;
-            -webkit-overflow-scrolling: touch;
+        .btn:hover {
+            background: #2a3f36;
+            border-color: var(--neon-dim);
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .btn--primary {
+            background: #00ffc822;
+            border-color: var(--neon);
+            color: var(--neon);
+        }
+
+        .btn--primary:hover {
+            background: #00ffc844;
+        }
+
+        /* ---------- WIDGETS ---------- */
+        .widgets {
+            display: flex;
+            gap: 12px;
+            flex-shrink: 0;
+            overflow-x: auto;
+            padding-bottom: 4px;
             scroll-snap-type: x mandatory;
         }
-        .widget {
-            background: rgba(5,10,5,0.9);
-            border: 1px solid var(--dark-green);
-            border-left: 3px solid var(--neon-green);
-            padding: 6px 8px; font-size: 10px;
-            flex: 0 0 auto; min-width: 120px;
-            scroll-snap-align: start;
-            border-radius: 0 4px 4px 0;
-        }
-        .widget-title {
-            font-weight: bold; margin-bottom: 4px;
-            text-transform: uppercase;
-            border-bottom: 1px solid var(--dark-green);
-            font-size: 9px;
-        }
-        .bar-container {
-            background: #002200; height: 8px;
-            width: 100%; margin-top: 4px;
-            border: 1px solid var(--neon-green);
-            border-radius: 2px;
-        }
-        .bar-fill {
-            height: 100%; background: var(--neon-green);
-            width: 50%; box-shadow: 0 0 6px var(--neon-green);
-            transition: width 0.2s ease;
-        }
-        .log-warn { color: #ff3333; }
-        .log-success { color: #00ffff; }
-        .log-ai { color: #88ff88; }
 
-        ::-webkit-scrollbar { width: 3px; height: 3px; }
-        ::-webkit-scrollbar-track { background: #001a00; }
-        ::-webkit-scrollbar-thumb { background: var(--neon-green); border-radius: 2px; }
+        .widget {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            flex: 0 0 auto;
+            min-width: 160px;
+            scroll-snap-align: start;
+            box-shadow: var(--shadow);
+        }
+
+        .widget__title {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .widget__value {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--neon);
+        }
+
+        .widget__bar {
+            margin-top: 8px;
+            height: 6px;
+            background: #1a2a22;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .widget__bar-fill {
+            height: 100%;
+            background: var(--neon);
+            border-radius: 20px;
+            box-shadow: 0 0 8px var(--neon);
+            transition: width 0.3s ease;
+        }
+
+        .widget__node {
+            font-size: 12px;
+            padding: 2px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .widget__node-name {
+            color: var(--text-muted);
+        }
+
+        .widget__node-status {
+            color: var(--neon);
+        }
+
+        /* ---------- UTILITIES ---------- */
+        .log-success { color: #00ffc8; }
+        .log-warn { color: #ff7a5c; }
+        .log-ai { color: #b8d9cf; }
+        .prompt { color: #ffffffcc; }
+
+        /* scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3a5a4a;
+            border-radius: 20px;
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 640px) {
+            .app {
+                padding: 10px 12px 14px 12px;
+                gap: 10px;
+            }
+            .header {
+                padding: 8px 14px;
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            .header__badge {
+                font-size: 9px;
+                padding: 0 10px;
+            }
+            .terminal__output {
+                padding: 14px 16px 8px 16px;
+                font-size: 12px;
+            }
+            .terminal__input-row {
+                padding: 10px 16px;
+            }
+            .ai-panel {
+                padding: 12px 16px;
+            }
+            .widget {
+                min-width: 130px;
+                padding: 12px 14px;
+            }
+            .widget__value {
+                font-size: 16px;
+            }
+            .btn {
+                font-size: 10px;
+                padding: 6px 14px;
+            }
+        }
 
         @media (max-width: 480px) {
-            #header { font-size: 10px; padding: 4px 8px; }
-            .widget { min-width: 100px; font-size: 9px; }
-            .q-btn { font-size: 9px; padding: 5px 8px; min-width: 60px; }
+            .header__left {
+                gap: 6px;
+                flex-wrap: wrap;
+            }
+            .header__status {
+                font-size: 10px;
+            }
+            .widgets {
+                gap: 8px;
+            }
+            .widget {
+                min-width: 110px;
+            }
         }
     </style>
 </head>
 <body>
-    <canvas id="matrixCanvas"></canvas>
-    <div class="overlay"></div>
+    <div class="app">
 
-    <div id="header">
-        <span>OMNI-AI NODE v5.0</span>
-        <span>STATUS: <span id="headerStatus" style="color:#00ff66;">ACTIVE</span></span>
-        <span id="clock">00:00:00</span>
-    </div>
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header__left">
+                <span style="font-weight: 600; color: var(--neon);">OMNI-AI</span>
+                <span class="header__badge">v5.0</span>
+                <div class="header__status">
+                    <span class="status-dot"></span>
+                    <span id="headerStatus">MONITORING</span>
+                </div>
+            </div>
+            <div class="header__clock" id="clock">00:00:00</div>
+        </header>
 
-    <div id="main-container">
-        <!-- Terminal with AI panel integrated -->
-        <div id="terminal-area">
-            <div id="terminal-logs">
-                <div>[INIT] OMNI-AI Core loaded</div>
-                <div>[AI] Agent status: MONITORING</div>
-                <div>[INFO] Type <span class="log-success">'help'</span> for commands</div>
-                <br>
-            </div>
-            <div class="cmd-line">
-                <span class="prompt">root@OMNI:~#</span>
-                <input type="text" id="cli" class="cmd-input" autofocus placeholder="tap to type...">
-            </div>
-        </div>
+        <!-- MAIN -->
+        <div class="main-grid">
 
-        <!-- AI Agent Panel -->
-        <div id="ai-panel">
-            <div id="ai-status-row">
-                <span>🤖 AI CORE</span>
-                <span>STATUS: <span id="ai-status-indicator">MONITORING</span></span>
+            <!-- TERMINAL -->
+            <div class="terminal">
+                <div class="terminal__output" id="terminalLogs">
+                    <div>[system] kernel loaded · omni-ai v5.0</div>
+                    <div>[ai] agent status: <span class="log-success">monitoring</span></div>
+                    <div>[info] type <span class="log-success">'help'</span> for commands</div>
+                    <div style="margin-top: 4px;"></div>
+                </div>
+                <div class="terminal__input-row">
+                    <span class="terminal__prompt">root@omni:~#</span>
+                    <input type="text" id="cliInput" class="terminal__input" placeholder="type a command ..." autofocus>
+                </div>
             </div>
-            <div id="ai-thought-stream">
-                <div>[AI] System idle. Awaiting tasks.</div>
-            </div>
-            <div id="quick-actions">
-                <button class="q-btn" data-action="ai optimize">⚡ OPTIMIZE</button>
-                <button class="q-btn" data-action="services">📡 SERVICES</button>
-                <button class="q-btn" data-action="auto-fix">🛠️ AUTO-FIX</button>
-            </div>
-        </div>
 
-        <!-- Telemetry widgets -->
-        <div id="sidebar">
-            <div class="widget">
-                <div class="widget-title">⚡ CPU</div>
-                <div>USAGE: <span id="cpuVal">42%</span></div>
-                <div class="bar-container"><div id="cpuBar" class="bar-fill" style="width:42%"></div></div>
+            <!-- AI PANEL -->
+            <div class="ai-panel">
+                <div class="ai-panel__header">
+                    <span class="ai-panel__title">🤖 ai agent</span>
+                    <span class="ai-panel__status" id="aiStatus">MONITORING</span>
+                </div>
+                <div class="ai-panel__thought" id="aiThought">
+                    <div>[ai] system idle · awaiting tasks</div>
+                </div>
+                <div class="ai-panel__actions">
+                    <button class="btn btn--primary" data-cmd="ai optimize">⚡ optimize</button>
+                    <button class="btn btn--primary" data-cmd="services">📡 services</button>
+                    <button class="btn btn--primary" data-cmd="ai fix-errors">🛠️ auto-fix</button>
+                    <button class="btn" data-cmd="auto-mode on">▶ auto-mode</button>
+                </div>
             </div>
-            <div class="widget">
-                <div class="widget-title">💾 RAM</div>
-                <div>LOAD: <span id="ramVal">68%</span></div>
-                <div class="bar-container"><div id="ramBar" class="bar-fill" style="width:68%"></div></div>
+
+            <!-- WIDGETS -->
+            <div class="widgets">
+                <div class="widget">
+                    <div class="widget__title">⚡ cpu</div>
+                    <div class="widget__value" id="cpuVal">42%</div>
+                    <div class="widget__bar">
+                        <div class="widget__bar-fill" id="cpuBar" style="width:42%"></div>
+                    </div>
+                </div>
+                <div class="widget">
+                    <div class="widget__title">💾 memory</div>
+                    <div class="widget__value" id="ramVal">68%</div>
+                    <div class="widget__bar">
+                        <div class="widget__bar-fill" id="ramBar" style="width:68%"></div>
+                    </div>
+                </div>
+                <div class="widget">
+                    <div class="widget__title">📡 nodes</div>
+                    <div class="widget__node">
+                        <span class="widget__node-name">local</span>
+                        <span class="widget__node-status">● online</span>
+                    </div>
+                    <div class="widget__node">
+                        <span class="widget__node-name">gateway</span>
+                        <span class="widget__node-status">● online</span>
+                    </div>
+                    <div class="widget__node">
+                        <span class="widget__node-name">proxy</span>
+                        <span class="widget__node-status" style="color:#ff7a5c;">● encrypted</span>
+                    </div>
+                </div>
             </div>
-            <div class="widget">
-                <div class="widget-title">📡 NODES</div>
-                <div>LOCAL: <span class="log-success">ON</span></div>
-                <div>GATEWAY: <span class="log-success">ON</span></div>
-                <div>PROXY: <span class="log-warn">ENC</span></div>
-            </div>
+
         </div>
     </div>
 
     <script>
         (function() {
-            "use strict";
+            'use strict';
 
-            // --- Matrix background (perf tuned) ---
-            const canvas = document.getElementById('matrixCanvas');
-            const ctx = canvas.getContext('2d');
-            let width, height, columns, drops;
-            function resizeCanvas() {
-                width = window.innerWidth;
-                height = window.innerHeight;
-                canvas.width = width;
-                canvas.height = height;
-                const fontSize = 12;
-                columns = Math.floor(width / fontSize);
-                drops = new Array(columns).fill(1);
-            }
-            resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@%&*';
-            const fontSize = 12;
-            function drawMatrix() {
-                ctx.fillStyle = 'rgba(0,0,0,0.06)';
-                ctx.fillRect(0,0,width,height);
-                ctx.fillStyle = '#00ff41';
-                ctx.font = fontSize + 'px monospace';
-                for (let i=0; i<drops.length; i++) {
-                    const text = chars[Math.floor(Math.random()*chars.length)];
-                    ctx.fillText(text, i*fontSize, drops[i]*fontSize);
-                    if (drops[i]*fontSize > height && Math.random()>0.975) drops[i]=0;
-                    drops[i]++;
-                }
-            }
-            let matrixInterval = setInterval(drawMatrix, 45);
-
-            // --- Clock & telemetry ---
-            function updateClock() {
-                document.getElementById('clock').innerText = new Date().toLocaleTimeString();
-                const cpu = Math.floor(Math.random()*40)+30;
-                const ram = Math.floor(Math.random()*20)+60;
-                document.getElementById('cpuVal').innerText = cpu+'%';
-                document.getElementById('cpuBar').style.width = cpu+'%';
-                document.getElementById('ramVal').innerText = ram+'%';
-                document.getElementById('ramBar').style.width = ram+'%';
-            }
-            setInterval(updateClock, 2500);
-
-            // --- AI Agent State ---
-            const aiStatusEl = document.getElementById('ai-status-indicator');
-            const aiThought = document.getElementById('ai-thought-stream');
+            // ---------- DOM refs ----------
+            const logs = document.getElementById('terminalLogs');
+            const cli = document.getElementById('cliInput');
+            const aiThought = document.getElementById('aiThought');
+            const aiStatusEl = document.getElementById('aiStatus');
             const headerStatus = document.getElementById('headerStatus');
+            const cpuVal = document.getElementById('cpuVal');
+            const cpuBar = document.getElementById('cpuBar');
+            const ramVal = document.getElementById('ramVal');
+            const ramBar = document.getElementById('ramBar');
+            const clockEl = document.getElementById('clock');
 
-            let aiState = 'MONITORING'; // MONITORING, THINKING, EXECUTING
+            // ---------- state ----------
+            let aiState = 'MONITORING';
             let autoMode = false;
             let autoInterval = null;
 
-            // Simulated services
             const services = {
-                firewall: { status: 'ACTIVE', failRate: 0.1 },
-                db_sync: { status: 'ACTIVE', failRate: 0.15 },
-                auto_backup: { status: 'ACTIVE', failRate: 0.05 },
-                port_monitor: { status: 'ACTIVE', failRate: 0.2 }
+                firewall:    { status: 'ACTIVE' },
+                db_sync:     { status: 'ACTIVE' },
+                auto_backup: { status: 'ACTIVE' },
+                port_monitor:{ status: 'ACTIVE' }
             };
 
+            // ---------- helpers ----------
             function setAIStatus(status) {
                 aiState = status;
-                aiStatusEl.innerText = status;
-                headerStatus.innerText = status;
-                if (status === 'MONITORING') {
-                    aiStatusEl.style.color = '#00ffaa';
-                } else if (status === 'THINKING') {
-                    aiStatusEl.style.color = '#ffaa00';
-                } else if (status === 'EXECUTING') {
-                    aiStatusEl.style.color = '#ff5500';
-                }
+                aiStatusEl.textContent = status;
+                headerStatus.textContent = status;
+                const colors = {
+                    MONITORING: '#00ffc8',
+                    THINKING:   '#ffb347',
+                    EXECUTING:  '#ff7a5c'
+                };
+                aiStatusEl.style.color = colors[status] || '#00ffc8';
             }
 
-            function addThought(msg, type='log-ai') {
+            function addThought(msg, className = '') {
                 const div = document.createElement('div');
-                div.className = type;
-                div.innerText = '[AI] ' + msg;
+                div.textContent = '[ai] ' + msg;
+                if (className) div.className = className;
                 aiThought.appendChild(div);
                 aiThought.scrollTop = aiThought.scrollHeight;
-                // keep last 8 thoughts
-                while (aiThought.children.length > 10) {
+                while (aiThought.children.length > 12) {
                     aiThought.removeChild(aiThought.firstChild);
                 }
             }
 
-            // --- Service helpers ---
-            function getServiceList() {
-                let list = '';
-                for (const [name, svc] of Object.entries(services)) {
-                    list += `  ${name}: ${svc.status}\n`;
+            function appendLog(text, className = '') {
+                const div = document.createElement('div');
+                div.textContent = text;
+                if (className) div.className = className;
+                logs.appendChild(div);
+                logs.scrollTop = logs.scrollHeight;
+                if (logs.children.length > 60) {
+                    logs.removeChild(logs.firstChild);
                 }
-                return list.trim();
             }
 
-            function setService(name, status) {
-                if (services[name]) {
-                    services[name].status = status;
-                    return true;
-                }
-                return false;
+            // ---------- clock & telemetry ----------
+            function updateTelemetry() {
+                const now = new Date();
+                clockEl.textContent = now.toLocaleTimeString();
+                const cpu = Math.floor(Math.random() * 35) + 30;
+                const ram = Math.floor(Math.random() * 18) + 62;
+                cpuVal.textContent = cpu + '%';
+                cpuBar.style.width = cpu + '%';
+                ramVal.textContent = ram + '%';
+                ramBar.style.width = ram + '%';
             }
+            setInterval(updateTelemetry, 2200);
+            updateTelemetry();
 
-            // --- AI Automation ---
+            // ---------- AI actions ----------
             function aiOptimize() {
                 setAIStatus('THINKING');
-                addThought('Running system optimization...');
+                addThought('analyzing system performance ...');
                 setTimeout(() => {
-                    // simulate clearing caches
-                    addThought('Cache cleared. Memory defragmented.');
+                    addThought('cache cleared · memory optimized');
                     setAIStatus('EXECUTING');
                     setTimeout(() => {
-                        addThought('Optimization complete. Performance +12%');
+                        addThought('✅ optimization complete (+14% efficiency)');
                         setAIStatus('MONITORING');
-                    }, 800);
-                }, 1000);
+                    }, 900);
+                }, 1100);
             }
 
             function aiFixErrors() {
                 setAIStatus('THINKING');
-                addThought('Scanning for service failures...');
+                addThought('scanning for service failures ...');
                 setTimeout(() => {
                     let fixed = false;
                     for (const [name, svc] of Object.entries(services)) {
                         if (svc.status === 'FAILED' || svc.status === 'STOPPED') {
                             svc.status = 'ACTIVE';
-                            addThought(`Restarted ${name} -> ACTIVE`);
+                            addThought(`↻ restarted ${name} → active`);
                             fixed = true;
                         }
                     }
-                    if (!fixed) addThought('No failures detected. All services stable.');
+                    if (!fixed) addThought('all services stable · no issues found');
                     setAIStatus('MONITORING');
                 }, 1200);
             }
@@ -415,117 +593,103 @@ Here is the complete, single-file HTML document that integrates the AI Automatio
             function toggleAutoMode(on) {
                 autoMode = on;
                 if (on) {
-                    addThought('AUTO-MODE ENABLED. AI will autonomously manage services.');
+                    addThought('▶ auto-mode enabled · ai will manage services');
                     if (autoInterval) clearInterval(autoInterval);
                     autoInterval = setInterval(() => {
-                        // randomly fail a service
                         const names = Object.keys(services);
-                        const rand = names[Math.floor(Math.random()*names.length)];
-                        if (Math.random() < 0.3 && services[rand].status === 'ACTIVE') {
+                        const rand = names[Math.floor(Math.random() * names.length)];
+                        if (Math.random() < 0.25 && services[rand].status === 'ACTIVE') {
                             services[rand].status = 'FAILED';
-                            addThought(`⚠️ ${rand} failed. Auto-fix initiated.`);
+                            addThought(`⚠️ ${rand} failed · auto-fix triggered`);
                             setTimeout(() => {
                                 services[rand].status = 'ACTIVE';
-                                addThought(`✅ ${rand} restored.`);
-                            }, 1500);
+                                addThought(`✅ ${rand} restored`);
+                            }, 1800);
                         }
-                        // also random stop
                         if (Math.random() < 0.1) {
-                            const s = names[Math.floor(Math.random()*names.length)];
+                            const s = names[Math.floor(Math.random() * names.length)];
                             if (services[s].status === 'ACTIVE') {
                                 services[s].status = 'STOPPED';
-                                addThought(`⏸️ ${s} stopped. Auto-restart...`);
+                                addThought(`⏸️ ${s} paused · restarting...`);
                                 setTimeout(() => {
                                     services[s].status = 'ACTIVE';
-                                    addThought(`▶️ ${s} restarted.`);
+                                    addThought(`▶️ ${s} restarted`);
                                 }, 2000);
                             }
                         }
-                    }, 5000);
+                    }, 6000);
                 } else {
                     if (autoInterval) clearInterval(autoInterval);
                     autoInterval = null;
-                    addThought('AUTO-MODE DISABLED.');
+                    addThought('⏹ auto-mode disabled');
                 }
             }
 
-            // --- Command processing ---
-            const cli = document.getElementById('cli');
-            const logs = document.getElementById('terminal-logs');
-
-            function appendLog(text, className = '') {
-                const div = document.createElement('div');
-                if (className) div.className = className;
-                div.innerText = text;
-                logs.appendChild(div);
-                logs.scrollTop = logs.scrollHeight;
-                if (logs.children.length > 50) logs.removeChild(logs.firstChild);
-            }
-
-            function processCommand(input) {
-                const parts = input.trim().split(/\s+/);
+            // ---------- command engine ----------
+            function processCommand(raw) {
+                const parts = raw.trim().split(/\s+/);
                 const cmd = parts[0].toLowerCase();
                 const args = parts.slice(1);
 
                 if (cmd === 'help') {
-                    appendLog("AVAILABLE COMMANDS:");
-                    appendLog("  help              - Show this list");
-                    appendLog("  services          - List all services & status");
-                    appendLog("  service start|stop|restart [name]");
-                    appendLog("  ai status|optimize|fix-errors");
-                    appendLog("  auto-mode on|off  - AI autonomous fixes");
-                    appendLog("  clear             - Clear terminal");
-                    appendLog("  matrix            - Toggle matrix rain");
+                    appendLog('── available commands ──');
+                    appendLog('  help              show this list');
+                    appendLog('  services          list all services');
+                    appendLog('  service start|stop|restart [name]');
+                    appendLog('  ai status|optimize|fix-errors');
+                    appendLog('  auto-mode on|off  autonomous fixes');
+                    appendLog('  clear             clear terminal');
+                    appendLog('  matrix            toggle matrix rain');
                 }
                 else if (cmd === 'services') {
-                    appendLog("ACTIVE SERVICES:");
+                    appendLog('── service status ──');
                     for (const [name, svc] of Object.entries(services)) {
-                        const color = svc.status === 'ACTIVE' ? 'log-success' : (svc.status === 'FAILED' ? 'log-warn' : '');
-                        appendLog(`  ${name}: ${svc.status}`, color);
+                        const cls = svc.status === 'ACTIVE' ? 'log-success' : (svc.status === 'FAILED' ? 'log-warn' : '');
+                        appendLog(`  ${name}: ${svc.status}`, cls);
                     }
                 }
                 else if (cmd === 'service') {
                     const action = args[0]?.toLowerCase();
                     const sname = args[1]?.toLowerCase();
                     if (!action || !sname || !['start','stop','restart'].includes(action)) {
-                        appendLog("Usage: service start|stop|restart [name]", 'log-warn');
+                        appendLog('usage: service start|stop|restart [name]', 'log-warn');
                         return;
                     }
                     if (!services[sname]) {
-                        appendLog(`Service '${sname}' not found.`, 'log-warn');
+                        appendLog(`service '${sname}' not found`, 'log-warn');
                         return;
                     }
                     if (action === 'start') {
                         if (services[sname].status === 'ACTIVE') {
-                            appendLog(`${sname} already active.`);
+                            appendLog(`${sname} already active`);
                         } else {
-                            setService(sname, 'ACTIVE');
-                            appendLog(`✅ ${sname} started.`, 'log-success');
+                            services[sname].status = 'ACTIVE';
+                            appendLog(`✅ ${sname} started`, 'log-success');
                         }
                     } else if (action === 'stop') {
                         if (services[sname].status === 'STOPPED') {
-                            appendLog(`${sname} already stopped.`);
+                            appendLog(`${sname} already stopped`);
                         } else {
-                            setService(sname, 'STOPPED');
-                            appendLog(`⏸️ ${sname} stopped.`, 'log-warn');
+                            services[sname].status = 'STOPPED';
+                            appendLog(`⏸️ ${sname} stopped`, 'log-warn');
                         }
                     } else if (action === 'restart') {
-                        setService(sname, 'ACTIVE');
-                        appendLog(`🔄 ${sname} restarted.`, 'log-success');
+                        services[sname].status = 'ACTIVE';
+                        appendLog(`🔄 ${sname} restarted`, 'log-success');
                     }
                 }
                 else if (cmd === 'ai') {
                     const sub = args[0]?.toLowerCase();
                     if (sub === 'status') {
-                        appendLog(`AI Agent status: ${aiState} | Auto-mode: ${autoMode ? 'ON' : 'OFF'}`);
+                        appendLog(`ai agent: ${aiState} · auto-mode: ${autoMode ? 'on' : 'off'}`);
                     } else if (sub === 'optimize') {
                         aiOptimize();
-                        appendLog('[AI] Optimization triggered.', 'log-ai');
+                        appendLog('[ai] optimization triggered', 'log-ai');
                     } else if (sub === 'fix-errors') {
                         aiFixErrors();
-                        appendLog('[AI] Error fix initiated.', 'log-ai');
+                        appendLog('[ai] error fix initiated', 'log-ai');
                     } else {
-                        appendLog("AI subcommands: status, optimize, fix-errors", 'log-warn');
+                        appendLog('ai subcommands: status, optimize, fix-errors', 'log-warn');
                     }
                 }
                 else if (cmd === 'auto-mode') {
@@ -533,85 +697,73 @@ Here is the complete, single-file HTML document that integrates the AI Automatio
                     if (mode === 'on') {
                         if (!autoMode) {
                             toggleAutoMode(true);
-                            appendLog('[AI] Auto-mode enabled.', 'log-ai');
-                        } else {
-                            appendLog('Auto-mode already on.');
-                        }
+                            appendLog('[ai] auto-mode enabled', 'log-ai');
+                        } else appendLog('auto-mode already on');
                     } else if (mode === 'off') {
                         if (autoMode) {
                             toggleAutoMode(false);
-                            appendLog('[AI] Auto-mode disabled.', 'log-ai');
-                        } else {
-                            appendLog('Auto-mode already off.');
-                        }
+                            appendLog('[ai] auto-mode disabled', 'log-ai');
+                        } else appendLog('auto-mode already off');
                     } else {
-                        appendLog("Usage: auto-mode on|off", 'log-warn');
+                        appendLog('usage: auto-mode on|off', 'log-warn');
                     }
                 }
                 else if (cmd === 'clear') {
                     logs.innerHTML = '';
+                    appendLog('[terminal cleared]');
                 }
                 else if (cmd === 'matrix') {
-                    if (matrixInterval) {
-                        clearInterval(matrixInterval);
-                        matrixInterval = null;
-                        canvas.style.opacity = '0';
-                        appendLog('[MATRIX] offline');
-                    } else {
-                        matrixInterval = setInterval(drawMatrix, 45);
-                        canvas.style.opacity = '0.1';
-                        appendLog('[MATRIX] online');
-                    }
+                    appendLog('[matrix] rain toggled (visual only)');
                 }
                 else if (cmd !== '') {
-                    appendLog(`Command '${input}' not found. Type 'help'.`, 'log-warn');
+                    appendLog(`unknown command: '${raw}' · type 'help'`, 'log-warn');
                 }
             }
 
+            // ---------- event bindings ----------
             cli.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') {
-                    const input = this.value.trim();
-                    if (input === '') return;
-                    appendLog(`root@OMNI:~# ${input}`, 'prompt');
+                    const val = this.value.trim();
+                    if (!val) return;
+                    appendLog(`root@omni:~# ${val}`, 'prompt');
                     this.value = '';
-                    processCommand(input);
-                    setTimeout(() => cli.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+                    processCommand(val);
+                    setTimeout(() => cli.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 60);
                 }
             });
 
-            // Quick action buttons
-            document.querySelectorAll('.q-btn').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    const action = this.dataset.action;
-                    if (action === 'ai optimize') {
-                        processCommand('ai optimize');
-                    } else if (action === 'services') {
-                        processCommand('services');
-                    } else if (action === 'auto-fix') {
-                        processCommand('ai fix-errors');
+            // quick-action buttons
+            document.querySelectorAll('[data-cmd]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const cmd = this.dataset.cmd;
+                    if (cmd) {
+                        cli.value = cmd;
+                        // simulate enter
+                        const event = new KeyboardEvent('keydown', { key: 'Enter' });
+                        cli.dispatchEvent(event);
                     }
                     cli.focus();
                 });
             });
 
-            // Touch focus
-            document.getElementById('terminal-area').addEventListener('touchstart', function(e) {
+            // focus input on tap anywhere in terminal
+            document.querySelector('.terminal').addEventListener('touchstart', function(e) {
                 if (e.target.tagName !== 'INPUT') cli.focus();
             }, { passive: true });
 
             setTimeout(() => cli.focus(), 300);
 
-            // Prevent pull-to-refresh
+            // prevent pull-to-refresh
             document.addEventListener('touchmove', function(e) {
-                const target = e.target;
-                if (target.closest('#terminal-logs') || target.closest('#sidebar') || target.closest('#ai-thought-stream')) return;
+                const t = e.target;
+                if (t.closest('.terminal__output') || t.closest('.widgets') || t.closest('.ai-panel__thought')) return;
                 e.preventDefault();
             }, { passive: false });
 
-            // Auto-start auto-mode as demo
+            // ---------- auto-start demo ----------
             setTimeout(() => {
                 processCommand('auto-mode on');
-            }, 2000);
+            }, 1800);
 
         })();
     </script>
